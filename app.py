@@ -11,6 +11,7 @@ from shopify import scrap_shopify
 from control_gerencial import control_gerencial 
 from cuadro_stock import app_ventas_stock
 from api_dropbox import descargar_archivos_dropbox
+from reporte_farmacity.farmacity_app import render_farmacity_page 
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 st.set_page_config(page_title="Caviahue Avance", layout="wide", page_icon="📦")
@@ -114,13 +115,14 @@ st.success(f"Bienvenido/a, {user_logged}")
 
 # 1. PERFIL ADMINISTRADOR
 if user_logged == "ADMIN":
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "📊 Ventas", 
         "🩺 Recetas por Médico", 
         "🎯 Cuotas", 
         "📦 Productos", 
         "📈 Control Gerencial", 
-        "🏭 Stock y Ventas"
+        "🏭 Stock y Ventas",
+        "🛒 Reporte Faltantes Farmacity"
     ])
     with tab1:
         ventas()
@@ -134,6 +136,8 @@ if user_logged == "ADMIN":
         control_gerencial()
     with tab6:
         app_ventas_stock()
+    with tab7:
+        render_farmacity_page()
 
 # 2. PERFIL M (REPRESENTANTES MÉDICOS)
 elif user_logged in M_REPRESENTANTES:
