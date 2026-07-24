@@ -11,3 +11,4 @@ altair==4.2.2
 pathlib
 dropbox
 rapidfuzz
+docx
