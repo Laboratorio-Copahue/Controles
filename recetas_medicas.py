@@ -6,19 +6,7 @@ import datetime
 import unicodedata
 
 # --- CONFIGURACIÓN DE REPRESENTANTES ---
-REPRESENTANTE_POR_USUARIO = {
-    "MROSSELOT": ["Marcela Rosselot"],
-    "PZACCA": ["Patricia Zacca"],
-    "YARRECHE": [],
-    "AFLEBA": ["LUCIO COLOMBO","AGUSTIN FLEBA"],
-    "YCUEZZO": ["YANINA CUEZO"],
-    "SROCCHI": ["Santiago Rocchi"],
-    "NBRIDI": ["Natalia Bridi"],
-    "DCHANDLER": ["DAIANA CHANDLER", "YAMILA ARRECHE"],
-    "MPUTZOLU": ["MARIANELA PUTZULO","EMILIANO VEIGA"],
-    "RABBENANTE" : ["ROMINA ABBENANTE"],
-    "OTROS": ["JESSICCA ANDERMARCH", "LEONARDO PAREDES"],
-}
+REPRESENTANTE_POR_USUARIO = st.secrets["REPRESENTANTE_POR_USUARIO"]
 
 def normalizar_texto(texto):
     """Elimina tildes, espacios extra y convierte a mayúsculas para emparejamientos seguros."""

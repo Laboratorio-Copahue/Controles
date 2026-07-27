@@ -76,9 +76,8 @@ PRODUCTOS_DB = [
             "emoliente ps 490",
             "emoliente 490",
             "crema ps 490",
-            "crema facial ps",
             "emoliente ps",
-            "emoliente",
+            "corporal ps",
         ],
     },
     {
@@ -97,7 +96,7 @@ PRODUCTOS_DB = [
         "cuf": "221171",
         "ean": "7798120265944",
         "desc": "CREMA FACIAL CON UREA CAVIAHUE X 45 GR",
-        "keywords": ["con urea", "urea", "crema urea"],
+        "keywords": ["crema facial ps", "facial urea", "facial ps"],
     },
     {
         "cuf": "245847",

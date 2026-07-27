@@ -30,9 +30,9 @@ def descargar_archivos_dropbox():
 
     # 3. Conexión con renovación automática
     dbx_base = dropbox.Dropbox(
-        app_key=st.secrets["APP_KEY"],
-        app_secret=st.secrets["APP_SECRET"],
-        oauth2_refresh_token=st.secrets["REFRESH_TOKEN"]
+        app_key=st.secrets["ACCESO_DROPBOX"]["APP_KEY"],
+        app_secret=st.secrets["ACCESO_DROPBOX"]["APP_SECRET"],
+        oauth2_refresh_token=st.secrets["ACCESO_DROPBOX"]["REFRESH_TOKEN"]
     )
 
     # Configuración de Team Space para cuentas de equipo

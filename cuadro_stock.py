@@ -5,16 +5,6 @@ import io
 import datetime
 from kits_config import PRODUCTOS_MAESTRO
 
-# --- CONFIGURACIÓN DE PRODUCTOS ---
-PRODUCTOS_IDS = [
-    19653, 22287,19415, 21420 , 22559 ,21422,21670, 21360, 21314, 21316, 21315, 21411, 18547, 18548, 
-    19060, 18921, 19749, 19676, 18550, 19515,  19074, 22560 , 20224,21991, 21992, 22285, 20035,
-    20037, 20036, 21660, 22151, 20093, 20170, 22622, 22715, 22708, 22701, 22709, 22743, 22702, 22716, 22710,
-    22717, 22703, 22711, 22718, 22704, 22712, 22719, 22713, 22705, 22720, 22714, 22721, 22706, 22707,21653,
-    22005, 	21656, 21657, 21655,	21658,	22251, 22618,	22619
-
-
-]
 
 def obtener_plan_df(path, hoja, anio, mes, nombre_col_plan):
     try:
@@ -78,7 +68,8 @@ def app_ventas_stock():
         return
 
     # --- PROCESAMIENTO ---
-    df_final = stock_dispro[stock_dispro["PRODU."].isin(PRODUCTOS_IDS)].copy()
+    #SI EN LA FILA "PRODCUTO" TIENEN "F/" O "Z-" O "MIZU" EN EL NOMBRE NO CONSIDERAMOS ESA LINEA
+    df_final = stock_dispro[~stock_dispro["Producto"].str.contains(r"F/|Z-|MIZU", case=False, na=False)].copy()
     df_final = df_final.merge(plan_farma, on="PRODU.", how="left")
     df_final = df_final.merge(plan_shopify, on="PRODU.", how="left")
     df_final = df_final.merge(venta_dispro, on="PRODU.", how="left")

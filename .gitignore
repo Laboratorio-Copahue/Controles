@@ -212,6 +212,7 @@ myenv/
 *.csv
 *.xlsx
 *.xls
+.docx
 
 # Scrape
 last_scrape.txt

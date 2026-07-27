@@ -6,17 +6,7 @@ import datetime
 import kits_config as KITS_ESTRUCTURA
 
 # --- CONFIGURACIÓN DE REPRESENTANTES ---
-REPRESENTANTE_POR_USUARIO = {
-    "MROSSELOT": ["Marcela Rosselot"],
-    "PZACCA": ["Patricia Zacca"],
-    "YARRECHE": ["Cuentas Claves"],
-    "AFLEBA": ["Agustin Fleba"],
-    "YCUEZZO": ["Yanina Cuezzo"],
-    "SROCCHI": ["Santiago Rocchi"],
-    "NBRIDI":["Natalia Bridi"],
-    "MPUTZOLU" : ["Mar del Plata"],
-    "OTROS" : [ "Gerencia","Mendoza" ],
-}
+REPRESENTANTE_POR_USUARIO = st.secrets["REPRESENTANTE_POR_USUARIO"]
 
 def resaltar_totales(row):
     cliente_val = str(row.get('CLIENTE', '')).upper()
@@ -97,42 +87,83 @@ def cuotas(representantes=[], usuario_id="default"):
         ventas_mes = pd.DataFrame(columns=["Cliente", "Venta Mes Actual"])
 
     # --- 2. INTEGRACIÓN ---
-    if not representantes: representantes = list(REPRESENTANTE_POR_USUARIO.keys())
-    nombres_planillas = [nombre for u in representantes if u in REPRESENTANTE_POR_USUARIO for nombre in REPRESENTANTE_POR_USUARIO[u]]
-            
+    
+    # --- 2. INTEGRACIÓN ---
+
+    if not representantes:
+        representantes = list(REPRESENTANTE_POR_USUARIO.keys())
+
+    # Extraemos todas las planillas que se intentarán buscar
+    nombres_planillas = [
+        nombre 
+        for u in representantes 
+        if u in REPRESENTANTE_POR_USUARIO 
+        for nombre in REPRESENTANTE_POR_USUARIO[u]
+    ]
+
+    # Obtenemos la lista real de pestañas del archivo para no intentar abrir las que no existen
+    excel_file = pd.ExcelFile(archivo_excel)
+    pestanas_existentes = excel_file.sheet_names
+
     hojas_rep = {}
+
     for nombre in nombres_planillas:
+        # Si la pestaña no existe en el Excel, la omitimos silenciosamente
+        if nombre not in pestanas_existentes:
+            continue
+
         try:
-            df_rep = pd.read_excel(archivo_excel, sheet_name=nombre)
+            # Cargamos la pestaña usando el objeto ExcelFile (más eficiente)
+            df_rep = pd.read_excel(excel_file, sheet_name=nombre)
             df_rep = df_rep.reset_index(drop=True)
             
+            # Limpieza de columna CLIENTE
             df_rep["CLIENTE"] = df_rep["CLIENTE"].astype(str).str.strip().str.upper()
             df_rep["CLIENTE"] = df_rep["CLIENTE"].str.replace("Ó", "O").str.replace("Á", "A")
             
+            # Conversión del N° CLIENTE
             df_rep["N° CLIENTE_INT"] = pd.to_numeric(df_rep["N° CLIENTE"], errors='coerce').fillna(-9999).astype(int)
             
-            df_rep = df_rep.drop(columns=["Total Caviahue"], errors="ignore").merge(ventas_mes, left_on="N° CLIENTE_INT", right_on="Cliente", how="left").drop(columns=["Cliente"], errors="ignore")
-            df_rep = df_rep.merge(df_hist_resumen, left_on="N° CLIENTE_INT", right_on="N° CLIENTE", how="left", suffixes=('', '_hist')).fillna(0)
+            # Merges con datos auxiliares
+            df_rep = df_rep.drop(columns=["Total Caviahue"], errors="ignore").merge(
+                ventas_mes, left_on="N° CLIENTE_INT", right_on="Cliente", how="left"
+            ).drop(columns=["Cliente"], errors="ignore")
+            
+            df_rep = df_rep.merge(
+                df_hist_resumen, left_on="N° CLIENTE_INT", right_on="N° CLIENTE", how="left", suffixes=('', '_hist')
+            ).fillna(0)
             
             df_rep["Acumulado año"] = df_rep["Hist_Act"] + df_rep["Venta Mes Actual"]
             
+            # Recálculo de totales por grupo
             t_mask = df_rep["CLIENTE"].str.contains("TOTAL", case=False, na=False)
             gid = t_mask.cumsum()
             for g in gid[t_mask].unique():
-                m = (gid == g); idx = df_rep[m & t_mask].index[0]; h = m & (~t_mask)
+                m = (gid == g)
+                idx = df_rep[m & t_mask].index[0]
+                h = m & (~t_mask)
                 for c in ["Cuota Caviahue", "Venta Mes Actual", "Venta 2024", "Venta 2025", "Acumulado año", "Venta 2025 YTD"]:
                     df_rep.loc[idx, c] = df_rep.loc[h, c].sum()
             
+            # Métricas de avance y crecimiento
             df_rep["Avance %"] = (df_rep["Venta Mes Actual"] / df_rep["Cuota Caviahue"].replace(0, np.nan)) * 100
             df_rep["Avance %"] = df_rep["Avance %"].fillna(0)
+            
             df_rep["growth 2025"] = (df_rep["Venta 2025"] / df_rep["Venta 2024"].replace(0, np.nan) - 1) * 100
             df_rep["growth 2025"] = df_rep["growth 2025"].fillna(0)
+            
             df_rep["growth 2026"] = (df_rep["Acumulado año"] / df_rep["Venta 2025 YTD"].replace(0, np.nan) - 1) * 100
             df_rep["growth 2026"] = df_rep["growth 2026"].fillna(0)
 
-            hojas_rep[nombre] = df_rep[["N° CLIENTE", "CLIENTE", "Cuota Caviahue", "Venta Mes Actual", "Avance %", "Venta 2024", "Venta 2025", "growth 2025", "Acumulado año", "growth 2026", "Venta 2025 YTD"]]
+            # Selección de columnas finales
+            hojas_rep[nombre] = df_rep[[
+                "N° CLIENTE", "CLIENTE", "Cuota Caviahue", "Venta Mes Actual", 
+                "Avance %", "Venta 2024", "Venta 2025", "growth 2025", 
+                "Acumulado año", "growth 2026", "Venta 2025 YTD"
+            ]]
+            
         except Exception as e:
-            st.error(f"Error en hoja {nombre}: {e}")
+            st.error(f"Error procesando la hoja '{nombre}': {e}")
 
     # --- 3. UI ---
     st.title("Control de Avance - Caviahue")

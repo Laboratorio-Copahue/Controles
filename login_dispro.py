@@ -1,8 +1,8 @@
 import requests
 import streamlit as st
 
-USER = st.secrets["DISPRO_USER"]  # Ya vi que tu login es este en el JWT :)
-PASSWORD = st.secrets["DISPRO_PASSWORD"]
+USER = st.secrets["ACCESO_DISPROFARMA"]["DISPRO_USER"]  # Ya vi que tu login es este en el JWT :)
+PASSWORD = st.secrets["ACCESO_DISPROFARMA"]["DISPRO_PASSWORD"]
 
 URL_LOGIN_PAGE = 'https://dispro360.disprofarma.com.ar/Dispro360/inicio/Login.aspx'
 URL_AUTH_ENDPOINT = 'https://dispro360.disprofarma.com.ar/WcfDispronet2/DispronetLogin.svc/AutenticarUsuario'

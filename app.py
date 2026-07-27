@@ -22,17 +22,6 @@ with cols[7]:
         st.image("logo.png")
 
 # --- DEFINICIÓN DE PERFILES Y REPRESENTANTES ---
-# Perfil A: Representantes Comerciales / Ventas
-A_REPRESENTANTES = [
-    'SROCCHI', 'PZACCA', 'MROSSELOT', 'AFLEBA', 
-    'YCUEZZO', 'YARRECHE', 'NBRIDI', 'GERENCIA', 
-    'MENDOZA', 'MPUTZOLU'
-]
-
-# Perfil M: Representantes Médicos
-M_REPRESENTANTES = ["DCHANDLER", "RABBENANTE"]
-
-
 # --- GESTIÓN DE SCRAPING / SINCRONIZACIÓN ---
 def get_last_scrape_time():
     if os.path.exists("last_scrape.txt"):
@@ -59,8 +48,8 @@ def run_scraping_if_needed():
                 scrape_data()
                 descargar_archivos_dropbox()
                 ventas_cav_shopify = scrap_shopify(
-                    st.secrets["CAVIAHUE_SHOP_DOMAIN"],
-                    st.secrets["CAVIAHUE_SHOP_TOKEN"]
+                    st.secrets["ACCESO_SHOPIFY"]["CAVIAHUE_SHOP_DOMAIN"],
+                    st.secrets["ACCESO_SHOPIFY"]["CAVIAHUE_SHOP_TOKEN"]
                 )
                 ventas_cav_shopify.to_csv('descargas/ventas_caviahue_shopify.csv', index=False)
                 scraped_correctly = True
@@ -140,7 +129,7 @@ if user_logged == "ADMIN":
         render_farmacity_page()
 
 # 2. PERFIL M (REPRESENTANTES MÉDICOS)
-elif user_logged in M_REPRESENTANTES:
+elif user_logged.endswith("_M"):
     st.markdown("### Recetas por médico")
     recetas_medicas(representantes=[user_logged], usuario_id=user_logged)
 
