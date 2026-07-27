@@ -2,7 +2,7 @@ import pandas as pd
 import re
 import unicodedata
 from rapidfuzz import fuzz
-from reporte_farmacity.PRODUCTOS_DB import PRODUCTOS_DB
+from kits_config import PRODUCTOS_DB
 
 
 def normalizar_texto(texto):

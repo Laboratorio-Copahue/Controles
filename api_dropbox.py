@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 import dropbox
 import streamlit as st
+from generar_diccionarios import generar_kits_config
+
 
 def descargar_archivos_dropbox():
     # 1. Determinar el directorio de destino
@@ -25,8 +27,9 @@ def descargar_archivos_dropbox():
         "db_SELL_IN_OUT.xlsx": f"{base_dropbox}/db_SELL_IN_OUT.xlsx",
         "representante.xlsx": f"{base_dropbox}/representante.xlsx",
         "Historico.xlsx": f"{base_dropbox}/Historico.xlsx",
-        "Recetas_por_médico.xlsx": f"{base_dropbox}/Recetas_por_médico.xlsx"
-    }
+        "Recetas_por_médico.xlsx": f"{base_dropbox}/Recetas_por_médico.xlsx",
+        "maestro_productos.xlsx": f"{base_dropbox}/maestro_productos.xlsx"
+    }  # Generar kits_config.py antes de la conexión a Dropbox
 
     # 3. Conexión con renovación automática
     dbx_base = dropbox.Dropbox(
@@ -46,7 +49,11 @@ def descargar_archivos_dropbox():
         try:
             dbx.files_download_to_file(str(ruta_local), ruta_remota)
             print(f" -> Descargado: {nombre_archivo}")
+           
+            
         except Exception as e:
             print(f" -> Error al descargar {nombre_archivo}: {e}")
+
+    generar_kits_config()
 
     return str(carpeta_destino)
